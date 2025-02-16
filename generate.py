@@ -28,6 +28,20 @@ TEMPLATE = """\
 </html>
 """
 
+HTML_404 = """\
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Not found</title>
+</head>
+<body>
+<h1>Page not found</h1>
+</body>
+</html>
+"""
+
 
 def html_path_li(path: str, is_dir: bool) -> str:
     if is_dir:
@@ -62,6 +76,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("rootdir")
     parser.add_argument("--prefix", default="/")
+    parser.add_argument("--add-404", action="store_true")
     args = parser.parse_args()
     rootdir = Path(args.rootdir)
     prefix = f"{args.prefix.rstrip('/')}/"
@@ -73,6 +88,11 @@ def main() -> None:
         except ValueError:
             pass
         generate_dir_listing(prefix, rootdir, dir, subdirs, files)
+
+    if args.add_404:
+        path_404 = rootdir / "404.html"
+        path_404.write_text(HTML_404)
+        print(f"Generated {path_404}", file=sys.stderr)
 
 
 if __name__ == '__main__':

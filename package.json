@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "./generate.py site",
+    "build": "./generate.py site --add-404",
     "cloudflare-deploy": "wrangler pages deploy --project-name=rmarkdown-assets --commit-dirty=true site"
   },
   "dependencies": {
