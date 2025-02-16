@@ -6,9 +6,8 @@ Generate a basic HTML directory listing.
 
 import argparse
 import sys
-from pathlib import Path
 from collections.abc import Iterable
-
+from pathlib import Path
 
 TEMPLATE = """\
 <!DOCTYPE html>
