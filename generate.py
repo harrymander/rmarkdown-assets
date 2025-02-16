@@ -18,7 +18,7 @@ TEMPLATE = """\
   <title>Directory listing for {dirname}</title>
 </head>
 <body>
-<h1>Directory listing for {dirname}</h1>
+<h1>Directory listing for <code>{dirname}</code></h1>
 <hr>
 <ul>
 {paths}
@@ -32,7 +32,7 @@ TEMPLATE = """\
 def html_path_li(path: str, is_dir: bool) -> str:
     if is_dir:
         path = f"{path.rstrip('/')}/"
-    return f'<li><a href="{path}">{path}</a></li>'
+    return f'<li><code><a href="{path}">{path}</a></code></li>'
 
 
 def generate_dir_listing(
