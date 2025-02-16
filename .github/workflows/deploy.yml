@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 jobs:
-  deploy:
+  deploy-github-pages:
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -24,3 +24,16 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
         id: deployment
+  deploy-cloudflare-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Generate directory listing
+        run: ./generate.py site
+      - name: Upload to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          command: pages deploy --project-name=rmarkdown-assets site
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
