@@ -29,8 +29,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Generate directory listing
-        run: ./generate.py site
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -38,9 +36,10 @@ jobs:
           cache: npm
       - name: Install node dependencies
         run: npm install
-      - name: Upload to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          command: pages deploy --project-name=rmarkdown-assets --commit-dirty=true site
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Generate directory listing
+        run: npm run build
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run cloudflare-deploy
