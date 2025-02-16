@@ -41,10 +41,6 @@ jobs:
       - name: Upload to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
-          command: |
-            pages deploy \
-              --project-name=rmarkdown-assets \
-              --commit-dirty=true \
-              site
+          command: pages deploy --project-name=rmarkdown-assets --commit-dirty=true site
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
