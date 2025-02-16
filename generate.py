@@ -46,7 +46,12 @@ def generate_dir_listing(
     html_paths.extend(html_path_li(d, True) for d in dirs)
     html_paths.sort()
     reldir = dir.relative_to(root)
-    dirname = f"{prefix}{'' if reldir == Path() else reldir}"
+    if reldir == Path():
+        dirname = prefix
+    else:
+        html_paths = [html_path_li("..", True), *html_paths]
+        dirname = f"{prefix}{reldir}"
+
     html = TEMPLATE.format(dirname=dirname, paths='\n'.join(html_paths))
     index_path = (dir / "index.html")
     index_path.write_text(html)
