@@ -93,8 +93,8 @@ def main() -> None:
         path_404 = rootdir / filename_404
         if not path_404.resolve().is_relative_to(rootdir.resolve()):
             raise ValueError("--404 path must be inside rootdir")
-        path_404.write_text(HTML_404.format(prefix=prefix))
-        print(f"Generated {path_404}", file=sys.stderr)
+    else:
+        path_404 = None
 
     for dir, subdirs, files in rootdir.walk():
         try:
@@ -104,6 +104,10 @@ def main() -> None:
         except ValueError:
             pass
         generate_dir_listing(prefix, rootdir, dir, subdirs, files)
+
+    if path_404:
+        path_404.write_text(HTML_404.format(prefix=prefix))
+        print(f"Generated {path_404}", file=sys.stderr)
 
 
 if __name__ == '__main__':
