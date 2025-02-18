@@ -88,6 +88,14 @@ def main() -> None:
     args = parser.parse_args()
     rootdir = Path(args.rootdir)
     prefix = f"{args.prefix.rstrip('/')}/"
+    filename_404 = getattr(args, "404")
+    if filename_404:
+        path_404 = rootdir / filename_404
+        if not path_404.resolve().is_relative_to(rootdir.resolve()):
+            raise ValueError("--404 path must be inside rootdir")
+        path_404.write_text(HTML_404.format(prefix=prefix))
+        print(f"Generated {path_404}", file=sys.stderr)
+
     for dir, subdirs, files in rootdir.walk():
         try:
             files.remove("index.html")
@@ -96,12 +104,6 @@ def main() -> None:
         except ValueError:
             pass
         generate_dir_listing(prefix, rootdir, dir, subdirs, files)
-
-    filename_404 = getattr(args, "404")
-    if filename_404:
-        path_404 = rootdir / filename_404
-        path_404.write_text(HTML_404.format(prefix=prefix))
-        print(f"Generated {path_404}", file=sys.stderr)
 
 
 if __name__ == '__main__':
