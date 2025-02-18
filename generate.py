@@ -38,6 +38,7 @@ HTML_404 = """\
 </head>
 <body>
 <h1>Page not found</h1>
+<p>Root directory: <a href="{prefix}">{prefix}</a></p>
 </body>
 </html>
 """
@@ -76,7 +77,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("rootdir")
     parser.add_argument("--prefix", default="/")
-    parser.add_argument("--no-404", action="store_true")
+    parser.add_argument(
+        "--404",
+        default="404.html",
+        help=(
+            "Path to 404 file relative to rootdir; "
+            "does not generate if empty."
+        ),
+    )
     args = parser.parse_args()
     rootdir = Path(args.rootdir)
     prefix = f"{args.prefix.rstrip('/')}/"
@@ -89,9 +97,10 @@ def main() -> None:
             pass
         generate_dir_listing(prefix, rootdir, dir, subdirs, files)
 
-    if not args.no_404:
-        path_404 = rootdir / "404.html"
-        path_404.write_text(HTML_404)
+    filename_404 = getattr(args, "404")
+    if filename_404:
+        path_404 = rootdir / filename_404
+        path_404.write_text(HTML_404.format(prefix=prefix))
         print(f"Generated {path_404}", file=sys.stderr)
 
 
