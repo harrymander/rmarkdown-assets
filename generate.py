@@ -76,7 +76,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("rootdir")
     parser.add_argument("--prefix", default="/")
-    parser.add_argument("--add-404", action="store_true")
+    parser.add_argument("--no-404", action="store_true")
     args = parser.parse_args()
     rootdir = Path(args.rootdir)
     prefix = f"{args.prefix.rstrip('/')}/"
@@ -89,7 +89,7 @@ def main() -> None:
             pass
         generate_dir_listing(prefix, rootdir, dir, subdirs, files)
 
-    if args.add_404:
+    if not args.no_404:
         path_404 = rootdir / "404.html"
         path_404.write_text(HTML_404)
         print(f"Generated {path_404}", file=sys.stderr)
