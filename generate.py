@@ -19,6 +19,7 @@ TEMPLATE = """\
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Directory listing for {dirname}</title>
+  <style>html {{ color-scheme: light dark; }}</style>
 </head>
 <body>
 <h1>Directory listing for <code>{dirname}</code></h1>
@@ -38,6 +39,7 @@ HTML_404 = """\
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Not found</title>
+  <style>html {{ color-scheme: light dark; }}</style>
 </head>
 <body>
 <h1>Page not found</h1>
