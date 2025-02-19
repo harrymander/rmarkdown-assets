@@ -10,6 +10,7 @@ import sys
 from collections.abc import Iterable
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import quote as urlquote
 
 TEMPLATE = """\
 <!DOCTYPE html>
@@ -92,9 +93,9 @@ def html_path_listing(path: Path, is_dir: bool) -> str:
     if is_dir:
         display_name = f"{display_name}/"
 
-    name_esc = f"{html_escape(name)}{'/' if is_dir else ''}"
     link = (
-        f'<a href="{name_esc}" title="{name_esc}">'
+        f'<a href="{urlquote(name)}" '
+        f'title="{html_escape(name)}{'/' if is_dir else ''}">'
         f'{html_escape(display_name)}</a>'
     )
     date = path_mtime(path).strftime("%Y-%m-%d %H:%M:%S %Z")
