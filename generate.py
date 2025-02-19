@@ -70,8 +70,15 @@ def path_mtime(path: Path) -> datetime:
         check=True,
         stdout=subprocess.PIPE,
     )
-    time_str = r.stdout.strip()
-    timestamp = int(time_str) if time_str else path.stat().st_mtime
+    if not r.stdout or r.stdout.isspace():
+        timestamp = path.stat().st_mtime
+        print(
+            f"Warning: cannot find git modification time for '{path}'",
+            file=sys.stderr,
+        )
+    else:
+        timestamp = int(r.stdout)
+
     return datetime.fromtimestamp(timestamp, UTC)
 
 
