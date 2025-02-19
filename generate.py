@@ -7,6 +7,7 @@ Generate a basic HTML directory listing.
 import argparse
 import sys
 from collections.abc import Iterable
+from datetime import datetime
 from pathlib import Path
 
 TEMPLATE = """\
@@ -20,9 +21,9 @@ TEMPLATE = """\
 <body>
 <h1>Directory listing for <code>{dirname}</code></h1>
 <hr>
-<ul>
+<pre>
 {paths}
-</ul>
+</pre>
 <hr>
 </body>
 </html>
@@ -44,10 +45,40 @@ HTML_404 = """\
 """
 
 
-def html_path_li(path: str, is_dir: bool) -> str:
+def html_escape(s: str) -> str:
+    return (
+        s
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
+
+
+PATH_MAX_WIDTH = 50
+
+
+def html_path_listing(path: Path, is_dir: bool) -> str:
+    name = path.name
+    width = PATH_MAX_WIDTH - 1 if is_dir else PATH_MAX_WIDTH
+    if len(name) > width:
+        display_name = f"{name[:width - 3]}..."
+    else:
+        display_name = name
     if is_dir:
-        path = f"{path.rstrip('/')}/"
-    return f'<li><code><a href="{path}">{path}</a></code></li>'
+        display_name = f"{display_name}/"
+
+    name_esc = f"{html_escape(name)}{'/' if is_dir else ''}"
+    link = (
+        f'<a href="{name_esc}" title="{name_esc}">'
+        f'{html_escape(display_name)}</a>'
+    )
+    stat = path.stat()
+    date = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+    padding = ' ' * (PATH_MAX_WIDTH - len(display_name))
+    size = "" if is_dir else f" {stat.st_size:>10}"
+    return f"{link}{padding} {date}{size}"
 
 
 def generate_dir_listing(
@@ -57,14 +88,14 @@ def generate_dir_listing(
     dirs: Iterable[str],
     files: Iterable[str],
 ):
-    html_paths = [html_path_li(f, False) for f in files]
-    html_paths.extend(html_path_li(d, True) for d in dirs)
+    html_paths = [html_path_listing(dir / f, False) for f in files]
+    html_paths.extend(html_path_listing(dir / d, True) for d in dirs)
     html_paths.sort()
     reldir = dir.relative_to(root)
     if reldir == Path():
         dirname = prefix
     else:
-        html_paths = [html_path_li("..", True), *html_paths]
+        html_paths = ['<a href="..">../</a>', *html_paths]
         dirname = f"{prefix}{reldir}"
 
     html = TEMPLATE.format(dirname=dirname, paths='\n'.join(html_paths))
