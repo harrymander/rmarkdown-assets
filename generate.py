@@ -5,9 +5,10 @@ Generate a basic HTML directory listing.
 """
 
 import argparse
+import subprocess
 import sys
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 TEMPLATE = """\
@@ -59,6 +60,21 @@ def html_escape(s: str) -> str:
 PATH_MAX_WIDTH = 50
 
 
+def path_mtime(path: Path) -> datetime:
+    """
+    Get modification date of path from git, falling back to system mtime if not
+    tracked in git.
+    """
+    r = subprocess.run(
+        ("git", "log", "-1", "--pretty=format:%ct", "--", path),
+        check=True,
+        stdout=subprocess.PIPE,
+    )
+    time_str = r.stdout.strip()
+    timestamp = int(time_str) if time_str else path.stat().st_mtime
+    return datetime.fromtimestamp(timestamp, UTC)
+
+
 def html_path_listing(path: Path, is_dir: bool) -> str:
     name = path.name
     width = PATH_MAX_WIDTH - 1 if is_dir else PATH_MAX_WIDTH
@@ -74,10 +90,9 @@ def html_path_listing(path: Path, is_dir: bool) -> str:
         f'<a href="{name_esc}" title="{name_esc}">'
         f'{html_escape(display_name)}</a>'
     )
-    stat = path.stat()
-    date = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+    date = path_mtime(path).strftime("%Y-%m-%d %H:%M:%S %Z")
     padding = ' ' * (PATH_MAX_WIDTH - len(display_name))
-    size = "" if is_dir else f" {stat.st_size:>10}"
+    size = "" if is_dir else f" {path.stat().st_size:>10}"
     return f"{link}{padding} {date}{size}"
 
 
