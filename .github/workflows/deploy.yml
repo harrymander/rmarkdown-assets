@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Generate directory listing
         run: ./generate.py --prefix /${GITHUB_REPOSITORY#*/} site
       - name: Upload Pages artifact
@@ -29,6 +31,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup node
         uses: actions/setup-node@v4
         with:
